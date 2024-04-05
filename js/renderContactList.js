@@ -52,7 +52,7 @@ function renderContactList() {
         }
         contactContainer.classList.toggle("highlighted");
         currentHighlightedDiv = contactContainer;
-        renderContact(contact.user_name);
+        renderContact(contact.name);
       });
 
       const acronymDiv = document.createElement("div");
@@ -65,7 +65,7 @@ function renderContactList() {
 
       const nameDiv = document.createElement("div");
       nameDiv.className = "contact_list_name";
-      nameDiv.textContent = contact.user_name;
+      nameDiv.textContent = contact.name;
 
       const mailDiv = document.createElement("div");
       mailDiv.className = "contact_list_mail";

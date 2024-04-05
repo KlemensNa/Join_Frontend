@@ -7,33 +7,24 @@ let edit_name = document.getElementById("edit_name");
 let edit_phone = document.getElementById("edit_phone");
 let edit_picture = document.getElementById("edit_avatar");
 
-let contacts = [
-  new Contact("Anja Schulz", +4917672446077, "schulz@gmail.com", "AS"),
-  new Contact("Alen Alduk", +4917672446077, "alen-1997@hotmail.de", "AA"),
-  new Contact("Anne Eberhard", +4917672446077, "anne.e@gmail.com", "AE"),
-  new Contact("Klemens Naue", +4917672446077, "klemens.n@gmail.com", "KN"),
-];
-
+let contacts;
+let currentUserName;
 let editingContact;
 
 /**
  * This function is used to first load the Templates, then it will load the Contacts from
  * the Backend.
  * After its loaded from the Backend. The Contactlist is getting rendered.
- *
  */
 async function init() {
   checkLogIn();
   await loadContacts();
-  renderContactList();
+  renderContactList()
 }
 
 /**
- *
  * This function takes the ID of the Modal as a paramter and closes it.
  * @param {string} - id of the Modal
- *
- *
  */
 function closeModal(id) {
   let modal = document.getElementById(id);
@@ -42,11 +33,8 @@ function closeModal(id) {
 }
 
 /**
- *
  * This function takes the ID of the Modal as a paramter and opens it.
  * @param {string} - id of the Modal
- *
- *
  */
 function openModal(id) {
   let modal = document.getElementById(id);
@@ -55,59 +43,27 @@ function openModal(id) {
 }
 
 /**
- *
  * This function calls another function that resets the input of the user
  * and closes the Modal with the given ID.
  * @param {string} - id of the Modal
- *
- *
  */
 function cancelContact(id) {
   resetForm();
   closeModal(id);
 }
 
-/**
- *
- * This function creates the Contact.
- * @param {string} - id of the Modal
- *
- *
- */
-async function createContact(id) {
-  let acronym = createAcronym(user_name.value);
-  let contact = new Contact(
-    user_name.value,
-    +phone.value,
-    email.value,
-    acronym.toUpperCase()
-  );
-  contacts.push(contact);
-  await setItem("contacts", JSON.stringify(contacts));
-  await loadContacts();
-  resetForm();
-  closeModal(id);
-  renderContactList();
-}
 
-/**
- *
- * This function loads the Contacts from the Backend.
- *
- */
-async function loadContacts() {
-  try {
-    contacts = JSON.parse(await getItem("contacts"));
-  } catch (e) {
-    console.error("Loading error:", e);
+function getRandomColor() {
+  const letters = "0123456789ABCDEF";
+  let color = "#";
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
   }
+  return color;
 }
 
 /**
- *
  * This help function resets the User Input.
- *
- *
  */
 function resetForm() {
   user_name.value = "";
@@ -116,17 +72,16 @@ function resetForm() {
 }
 
 /**
- *
  * This function renders the Contact Details in the render Element ID.
  * @param {string} - the contact that should be rendered is taken as a parameter.
- *
- *
  */
 function renderContact(username) {
+  
   let contact = findContactByUserName(username);
+  currentUserName = contact.name;
   let email = contact.email;
   let phone = contact.phone;
-  let name = contact.user_name;
+  let name = contact.name;
   let acronym = contact.acronym;
   let color = contact.color;
   content = document.getElementById("render");
@@ -134,106 +89,40 @@ function renderContact(username) {
 }
 
 /**
- *
  * This help function finds the wanted contact.
  * @param {string} - @param {string} - the contact that should be found is taken as a parameter.
- *
- *
  */
 function findContactByUserName(userName) {
-  return contacts.find((contact) => contact.user_name === userName);
+  return contacts.find((contact) => contact.name === userName);
 }
 
 /**
- *
  * This function edits the Contact Info of the User.
  * @param {string} - the contact that should be found is taken as a parameter.
- *
- *
  */
 function editContact(user) {
   openModal("edit_contact_modal");
 
   editingContact = findContactByUserName(user);
-  edit_name.value = editingContact.user_name;
+  edit_name.value = editingContact.name;
   edit_email.value = editingContact.email;
   edit_phone.value = editingContact.phone;
   edit_picture.innerHTML = editingContact.acronym;
   edit_picture.style.backgroundColor = editingContact.color;
 }
 
-/**
- *
- * This function saves the edited Contact in the Backend.
- *
- *
- *
- */
-async function saveEditedContact() {
-  let acronym = createAcronym(edit_name.value);
-  editingContact.user_name = edit_name.value;
-  editingContact.email = edit_email.value;
-  editingContact.phone = edit_phone.value;
-  editingContact.acronym = acronym;
-  resetEditForm();
-  await setItem("contacts", JSON.stringify(contacts));
-  await loadContacts();
-  renderContactList();
-  closeModal("edit_contact_modal");
-  renderContact(editingContact.user_name);
-}
 
 /**
- *
- * This function deletes the Contact and saves the Contactlist in the Backend again.
- * @param {string} - the contact that should be deleted is taken as a parameter.
- *
- *
- */
-
-async function deleteContact(user) {
-  let target = user;
-  let indexToRemove = contacts.findIndex(
-    (contact) => contact.user_name === target
-  );
-
-  if (indexToRemove !== -1) {
-    contacts.splice(indexToRemove, 1);
-    await setItem("contacts", JSON.stringify(contacts));
-    loadContacts();
-    renderContactList();
-    document.getElementById("render").innerHTML = "";
-    window.location.href = "contacts.html";
-  }
-}
-
-/**
- *
  * This function deletes the Contact inside of a Modal.
  * @param {string} - the Modal that should be closed.
- *
- *
  */
 async function deleteContactInModal(id) {
-  let modal = document.getElementById(id);
-  target = modal.value;
-  let toDelete = contacts.findIndex((contact) => contact.user_name === target);
-
-  if (toDelete !== -1) {
-    contacts.splice(toDelete, 1);
-    await setItem("contacts", JSON.stringify(contacts));
-    loadContacts();
-    renderContactList();
-    closeModal("edit_contact_modal");
-    document.getElementById("render").innerHTML = "";
-  }
+  deleteContact(currentUserName); 
+  closeModal("edit_contact_modal");  
 }
 
 /**
- *
  * This help function deletes User Input inside the Edit Modal.
- *
- *
  */
 function resetEditForm() {
   edit_name.value = "";
@@ -241,11 +130,15 @@ function resetEditForm() {
   edit_phone.value = "";
 }
 
+
+function resetAddContactsForm(){
+  document.getElementById("name").value = "";
+  email.value = "";
+  phone.value = "";
+}
+
 /**
- *
  * This function is for highlighting the current chosen User
- *
- *
  */
 function changeDisplay() {
   let container = document.getElementById("contact_container");
@@ -256,10 +149,7 @@ function changeDisplay() {
 
 
 /**
- *
  * This function puts a upper case on the first and last Name as the user types
- *
- *
  */
 
 function capitalizeName(modal) {
@@ -275,15 +165,12 @@ function capitalizeName(modal) {
 
 
 /**
- *
  * This help function is used for the HTML Template to render Contact Details.
  * @param {string} - email - email of Contact
  * @param {string} - phone - phone of Contact
  * @param {string} - name - name of Contact
  * @param {string} - acronym - acronym of Contact
  * @param {string} - color - color of Contact
- *
- *
  */
 
 function htmlUserTemplate(email, phone, name, acronym, color) {
@@ -338,4 +225,122 @@ function htmlUserTemplate(email, phone, name, acronym, color) {
     </div>
   </div>
 </div>`;
+}
+
+
+
+
+/**
+ * HTTP Requests GET, POST, PUT, DELETE
+ * 
+ */
+
+
+async function loadContacts() {
+
+  const url = "http://127.0.0.1:8000/contact/";
+  await fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      contacts = data
+      renderContactList()
+    })
+    .catch(error => {
+      console.error("Fehler beim Abrufen der Daten:", error);
+    })
+}
+
+
+/**
+ *
+ * This function loads the Contacts from the Backend.
+ *
+ */
+async function createContact(id) {
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+
+  let acronym = createAcronym(user_name.value);
+
+  const raw = JSON.stringify({
+    "name": user_name.value,
+    "email": email.value,
+    "phone": +phone.value,
+    "acronym": acronym,
+    "color": getRandomColor()
+  });
+
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow"
+  };
+
+  fetch("http://127.0.0.1:8000/contact/", requestOptions)
+    .then((response) => response.text())
+    .then(() => {resetAddContactsForm(), loadContacts(), renderContactList()})
+    .then(closeModal(id))
+    .catch((error) => console.error(error));
+}
+
+
+
+async function saveEditedContact() {
+  const contactId = editingContact.id;
+  let acronym = createAcronym(edit_name.value);
+
+  const updatedContactData = {
+    name: edit_name.value,
+    email: edit_email.value,
+    phone: edit_phone.value,
+    acronym: acronym,
+    color: editingContact.color
+  };
+
+  fetch(`http://127.0.0.1:8000/contact/${contactId}/`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(updatedContactData),
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(async data => {
+      console.log('Erfolgreich aktualisiert:', data);
+      closeModal("edit_contact_modal");
+      await loadContacts();
+      renderContact(edit_name.value)
+    })
+    .catch(error => {
+      console.error('Fehler beim Aktualisieren:', error);
+    });
+}
+
+
+/**
+ *
+ * This function deletes the Contact and saves the Contactlist in the Backend again.
+ * @param {string} - the contact that should be deleted is taken as a parameter.
+ */
+
+async function deleteContact(username) {
+  let contact = findContactByUserName(username);
+  const contactId = contact.id;
+
+  fetch(`http://127.0.0.1:8000/contact/${contactId}/`, {
+    method: 'DELETE',
+  })
+    .then(response => {
+      console.log('Kontakt erfolgreich gelöscht');
+      loadContacts()
+    })
+    .catch(error => {
+      console.error('Fehler beim Löschen des Kontakts:', error);
+    });
 }

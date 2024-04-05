@@ -13,21 +13,7 @@ async function loadUser() {
 }
 
 async function loginUser() {
-  // let error = document.getElementById("error");
-  // loadUsers();
-  // if (users[0].email == email.value && users[0].password == password.value) {
-  //   password.classList.remove("border-red");
-  //   error.style = "display: none;";
-  //   window.location.href = "summary.html";
-  //   localStorage.setItem(`currentUser`, `${users[0].name}`);
-  //   localStorage.setItem(`loggedIn`, true);
-  //   cacheData();
-  // } else {
-  //   password.classList.add("border-red");
-  //   error.style = "display: flex;";
-  //   password.value = "";
-  // }
-
+  
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
 
@@ -54,7 +40,8 @@ async function loginUser() {
     const username = tokenJson.username;
     localStorage.setItem('token', token)
     localStorage.setItem('currentUser', username)
-    // window.location.href = "./summary.html"; // Hier kannst du die Antwort verarbeiten
+    localStorage.setItem(`loggedIn`, true);
+    window.location.href = "./summary.html"; // Hier kannst du die Antwort verarbeiten
   } catch (error) {
     console.error(error);
   }
