@@ -13,7 +13,7 @@ let newSummaryDueDate;
  */
 async function loadSummary(){
     checkLogIn();
-    await loadItems();    
+    // await loadItems();    
     await countTasks();       
     greetingSummary(); 
 }
@@ -179,7 +179,7 @@ function createGreetingPhrase(){
  * @returns Name of User or nothing when Guest is online
  */
 async function createNameGreating(){
-        await loadUsers();
+        await loadUser();
         if(currentUser == 'Guest'){
             return
         } else{

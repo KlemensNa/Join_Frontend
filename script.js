@@ -1,46 +1,79 @@
 let currentUser;
 
 function init() {
-  loadUsers();
   loadCache();
 }
 
-async function loadUsers() {
+async function loadUser() {
   try {
-    users = JSON.parse(await getItem("users"));
+    currentUser = localStorage.getItem("currentUser");
   } catch (e) {
     console.error("Loading error:", e);
   }
 }
 
-function loginUser() {
-  let error = document.getElementById("error");
-  loadUsers();
-  if (users[0].email == email.value && users[0].password == password.value) {
-    password.classList.remove("border-red");
-    error.style = "display: none;";
-    window.location.href = "summary.html";
-    localStorage.setItem(`currentUser`, `${users[0].name}`);
-    localStorage.setItem(`loggedIn`, true);
-    cacheData();
-  } else {
-    password.classList.add("border-red");
-    error.style = "display: flex;";
-    password.value = "";
-  }
-}
+async function loginUser() {
+  // let error = document.getElementById("error");
+  // loadUsers();
+  // if (users[0].email == email.value && users[0].password == password.value) {
+  //   password.classList.remove("border-red");
+  //   error.style = "display: none;";
+  //   window.location.href = "summary.html";
+  //   localStorage.setItem(`currentUser`, `${users[0].name}`);
+  //   localStorage.setItem(`loggedIn`, true);
+  //   cacheData();
+  // } else {
+  //   password.classList.add("border-red");
+  //   error.style = "display: flex;";
+  //   password.value = "";
+  // }
 
-function guestUser() {
-  localStorage.setItem(`currentUser`, `Guest`);
-  window.location.href = "summary.html";
-  localStorage.setItem(`loggedIn`, true);
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+
+  const raw = JSON.stringify({
+    "username": email.value,
+    "password": password.value,
+    "email": email.value
+  });
+
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow"
+  };
+
+  console.log(requestOptions)
+
+  try {
+    const response = await fetch("http://127.0.0.1:8000/login/", requestOptions);
+    const result = await response.text();
+    const tokenJson = JSON.parse(result)
+    const token = tokenJson.token;
+    const username = tokenJson.username;
+    localStorage.setItem('token', token)
+    localStorage.setItem('currentUser', username)
+    // window.location.href = "./summary.html"; // Hier kannst du die Antwort verarbeiten
+  } catch (error) {
+    console.error(error);
+  }
+
+
   
 }
 
+function guestUser() {
+  // localStorage.setItem(`currentUser`, `Guest`);
+  // window.location.href = "summary.html";
+  // localStorage.setItem(`loggedIn`, true);
 
-function checkLogIn(){
+}
+
+
+function checkLogIn() {
   let LogInStatus = localStorage.getItem(`loggedIn`);
-  if(LogInStatus == 'false'){
+  if (LogInStatus == 'false') {
     alert('Please Log In to view this Page.');
     setTimeout(window.location.href = "index.html", 2000);
   }
@@ -51,7 +84,7 @@ function cacheData() {
   if (check.checked == true) {
     localStorage.setItem("email", `${email.value}`);
     localStorage.setItem(`password`, `${password.value}`);
-    
+
   }
 }
 

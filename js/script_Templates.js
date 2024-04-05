@@ -95,7 +95,7 @@ function togglePopupBar() {
  * @param {} - no parameter
  */
 async function createNameCircle() {
-  await loadUsers();
+  // await loadUser();
   let acronym = createAcronym(currentUser);
   let topbar = document.getElementById("topbar_icons");
   let mobiletopbar = document.getElementById("mobile_topbar_icons");

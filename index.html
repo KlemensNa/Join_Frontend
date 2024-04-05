@@ -27,10 +27,12 @@
       </div>
       <div class="login-container">
         <h1>Log in</h1>
-        <form id="login-form" onsubmit="loginUser(); return false;">
+        <div id="login-form">
           <div class="line"></div>
           <div class="input-container">
-            <input id="email" type="email" placeholder="Email" />
+            <input id="email" 
+                   type="text"
+                   placeholder="Username" />
             <input
               id="password"
               class=""
@@ -49,12 +51,12 @@
             <a href="forgot.html" id="remember-link">I forgot my password</a>
           </div>
           <div class="login-buttons">
-            <button type="submit" id="login">Log in</button>
-            <button type="button" id="guest-login" onclick="guestUser();">
+            <button type="button" id="login" onclick="loginUser()">Log in</button>
+            <button type="button" id="guest-login" onclick="guestUser()">
               Guest Log in
             </button>
           </div>
-        </form>
+        </div>
       </div>
       <footer class="footer">
         <a target="_blank" href="privacy_police.html">Privacy Policy</a>
