@@ -51,8 +51,9 @@ function templateCategory() {
 function renderCategoryOptions() {
   document.getElementById("categoryOptions").innerHTML = "";
   for (let i = 0; i < categories.length; i++) {
+    console.log(categories)
     const category = categories[i]["name"];
-    const colorCode = categories[i]["colorCode"];
+    const colorCode = categories[i]["color"];
     if (i == 0) {
       document.getElementById("categoryOptions").innerHTML +=
         templateCategoryOptionsFirst(category, i);
@@ -146,7 +147,7 @@ function closeOptions(mode) {
  */
 function selectCategory(i) {
   const category = categories[i]["name"];
-  const colorCode = categories[i]["colorCode"];
+  const colorCode = categories[i]["color"];
   assignedCategory = category;
   document.getElementById("categorySelection").value = category;
   document.getElementById("categorySelectionCircle").innerHTML = /*html*/ `
@@ -316,9 +317,12 @@ function addColor(i) {
 async function addCategory() {
   const newCategoryObject = {
     name: newCategoryName,
-    colorCode: newCategoryColor,
+    color: newCategoryColor,
   };
+  // POST new Category and GET new CAT
   categories.push(newCategoryObject);
+  addNewCategory()
+
   let lastItem = categories.length - 1;
   const indexToRemove = freeColors.indexOf(newCategoryColor);
   if (indexToRemove !== -1) {

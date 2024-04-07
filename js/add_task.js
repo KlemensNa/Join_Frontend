@@ -47,13 +47,27 @@ async function initTask() {
  */
 async function loadItems() {
   try {
-    tasks = JSON.parse(await getItem("tasks"));
-    contacts = JSON.parse(await getItem("contacts"));
-    categories = JSON.parse(await getItem("savedCategories"));
-    freeColors = JSON.parse(await getItem("savedFreeColors"));
+    await loadContactDropdown()
+    await loadCategoryDropdown() // hier wieter mit frontend function für category 
+    // tasks = JSON.parse(await getItem("tasks"));
+    // freeColors = JSON.parse(await getItem("savedFreeColors"));
   } catch (e) {
     console.error("Loading error:", e);
   }
+}
+
+/**
+ * GET-Request of Contacts (storage.js)
+ * parse json to use objects
+ */
+async function loadContactDropdown() {
+  await loadContacts();
+  // contacts = JSON.parse(contacts)
+}
+
+
+async function loadCategoryDropdown(){
+  await loadCategories()
 }
 
 
@@ -65,7 +79,7 @@ async function loadItems() {
 async function renderContacts(idContactContainer, mode) {
   document.getElementById(idContactContainer).innerHTML = templateContactSelection(mode);
   for (let i = 0; i < contacts.length; i++) {
-    const contact = contacts[i]['user_name'];
+    const contact = contacts[i]['name'];
     document.getElementById(`contactsOptions${mode}`).innerHTML += templateContactsOptions(contact, i, mode);
   }
   document.getElementById(`contactsOptions${mode}`).innerHTML += templateNewContact();
@@ -133,8 +147,8 @@ function templateNewContact() {
  * @param {number} i - index of the JSON contacts 
  * @param {string} mode - mode of either add or edit
  */
-function handlecheckContactClick(event,i, mode) {
-  event.stopPropagation(); 
+function handlecheckContactClick(event, i, mode) {
+  event.stopPropagation();
   checkContact(i, mode);
 }
 
@@ -160,7 +174,7 @@ function checkContact(i, mode) {
  * @param {string} mode - mode of either add or edit
  */
 function assignContact(i, mode) {
-  boxId = 'contactCheckBox'+ mode + i;
+  boxId = 'contactCheckBox' + mode + i;
   document.getElementById(boxId).innerHTML = /*html*/`
     <div class="checkBoxChecked hover"></div>`;
   assignedContactsStatus[i] = true;
@@ -173,7 +187,7 @@ function assignContact(i, mode) {
  * @param {string} mode - mode of either add or edit
  */
 function unassignContact(i, mode) {
-  boxId = 'contactCheckBox'+mode+i;
+  boxId = 'contactCheckBox' + mode + i;
   document.getElementById(boxId).innerHTML = /*html*/``;
   assignedContactsStatus[i] = false;
 }
@@ -184,7 +198,7 @@ function unassignContact(i, mode) {
  * @param - no parameter
  */
 function updateAssignedContacts() {
- 
+
   assignedContacts = [];
   document.getElementById('contactAlert').innerHTML = '';
   for (let i = 0; i < assignedContactsStatus.length; i++) {
@@ -201,23 +215,23 @@ function updateAssignedContacts() {
 /**
  * creates Icons of People who are choosen in "Assigend to" dropdown
  */
-function displayAssignedContacts(){
+function displayAssignedContacts() {
   const assignedContactsDisplay = document.getElementById('assignedContactsDisplay');
   assignedContactsDisplay.innerHTML = ''; // Zurücksetzen der Anzeige
   if (assignedContacts.length > 0) {
-    for (const contact of assignedContacts) {    
-        let newCircle = document.createElement('div');
-        newCircle.classList.add('assignedContactsDisplayIcon');
-        newCircle.style.backgroundColor = contact.color;
-        newCircle.innerHTML = contact.acronym;
-        newCircle.title = contact.user_name;
+    for (const contact of assignedContacts) {
+      let newCircle = document.createElement('div');
+      newCircle.classList.add('assignedContactsDisplayIcon');
+      newCircle.style.backgroundColor = contact.color;
+      newCircle.innerHTML = contact.acronym;
+      newCircle.title = contact.user_name;
       assignedContactsDisplay.appendChild(newCircle);
     }
   }
 }
 
 
-function renderDisplayedContactsIcon(){
+function renderDisplayedContactsIcon() {
 
 }
 
@@ -286,7 +300,7 @@ function assignPrio(chosenPrio, mode) {
 function renderAssignedPrio(chosenPrio, mode) {
   for (let i = 0; i < prios.length; i++) {
     const prio = prios[i];
-    priomode = prio+mode;
+    priomode = prio + mode;
     const prioBox = document.getElementById(`${priomode}`);
     const capitalPrio = prio.charAt(0).toUpperCase() + prio.slice(1);
     if (prio === chosenPrio && prioBox.classList.contains(prio) === false) {
@@ -307,7 +321,7 @@ function renderAssignedPrio(chosenPrio, mode) {
  */
 function checkAddSubTask(id, mode) {
   const subTaskName = document.getElementById(`inputSubtask${mode}`).value.trim();
-  
+
   if (subTaskName === "") {
     document.getElementById('subTaskAlertAdd').innerHTML = "Bitte einen Wert hinzufügen";
   } else {

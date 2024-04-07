@@ -10,7 +10,6 @@ function renderContactList() {
   contactsContainer.innerHTML = "";
 
   const groupedContacts = {};
-
   // Group contacts by their acronym
   for (const contact of contacts) {
     const firstLetter = contact.acronym.charAt(0).toUpperCase();
