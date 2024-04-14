@@ -32,11 +32,13 @@ async function clearTask() {
  * this function creates the respective JSOn tasks if all requirements are met and adds it to the array tasks
  * @param {Event} event - needed to prevent new loading of form
  */
-function createTask(event) {
+async function createTask(event) {
   event.preventDefault();
   let prioFilled = checkPrio();
   let correctCategory = checkCorrectCategory();
   let correctContact = checkCorrectContact();
+  let contactPKs = makeContacktPKArray();
+  console.warn(subTasksIDs)
   if (prioFilled == true && correctCategory == true && correctContact == true) {
     let title = document.getElementById("title").value;
     let description = document.getElementById("description").value;
@@ -44,22 +46,43 @@ function createTask(event) {
     let task = {
       title: title,
       description: description,
-      category: assignedCategory,
-      assignedContacts: assignedContacts,
-      dueDate: dueDate,
+      category: assignedCategory['id'],
+      assigned_to: contactPKs,
+      due_date: dueDate,
       prio: assignedPrio,
-      subtasks: subTasksArray,
+      subtasks: subTasksIDs,
       column: column,
     };
     tasks.push(task);
-    saveTask();
-    popUpNotice();
+    saveTask(task);
     flushSubtasks();
+    popUpNotice();
   }
+}
+
+
+function makeContacktPKArray(){
+  let pkArray = [];
+  assignedContacts.forEach(element => {
+    pkArray.push(element['id'])
+  });
+
+  return pkArray
+}
+
+
+function makeSubtasksPKArray(id){
+  subTasksIDs.push(id)
+}
+
+
+function addSubtasks(){
+  saveSubtasks();
 }
 
 function flushSubtasks() {
   subTasksArray = [];
+  subTasksIDs = [];
 }
 
 /**
@@ -132,10 +155,33 @@ function switchToBoard() {
  * this function seves the JSONs tasks, savedCategories and the array savedfreeColors to the backend
  * @param - no param
  */
-async function saveTask() {
-  await setItem("tasks", JSON.stringify(tasks));
-  await setItem("savedCategories", JSON.stringify(categories));
-  await setItem("savedFreeColors", JSON.stringify(freeColors));
+async function saveTask(task) {
+
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+
+  task = JSON.stringify(task)
+  console.warn(task)
+
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: task,
+    redirect: "follow"
+  };
+
+  await fetch(STORAGE_URL + "task/", requestOptions)
+    .then((response) => response.text())
+    .then((response) => console.warn(response))
+    // .then(resetAddContactsForm(), closeModal(id))
+    .catch((error) => console.error(error));
+
+
+
+
+  // await setItem("tasks", JSON.stringify(tasks));
+  // await setItem("savedCategories", JSON.stringify(categories));
+  // await setItem("savedFreeColors", JSON.stringify(freeColors));
 }
 
 /**

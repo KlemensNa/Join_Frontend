@@ -51,7 +51,6 @@ function templateCategory() {
 function renderCategoryOptions() {
   document.getElementById("categoryOptions").innerHTML = "";
   for (let i = 0; i < categories.length; i++) {
-    console.log(categories)
     const category = categories[i]["name"];
     const colorCode = categories[i]["color"];
     if (i == 0) {
@@ -148,7 +147,7 @@ function closeOptions(mode) {
 function selectCategory(i) {
   const category = categories[i]["name"];
   const colorCode = categories[i]["color"];
-  assignedCategory = category;
+  assignedCategory = categories[i];
   document.getElementById("categorySelection").value = category;
   document.getElementById("categorySelectionCircle").innerHTML = /*html*/ `
     <div class="circle" style="background-color: ${colorCode}"></div>`;

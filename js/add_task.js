@@ -15,6 +15,8 @@ let assignedContacts = [];
 let assignedContactsStatus = new Array(contacts.length).fill(false);
 let assignedPrio = '';
 let subTasksArray = [];
+let subTasksIDs = [];
+let newSub;
 
 //these are needed for the site to function
 let prios = ['urgent', 'medium', 'low'];
@@ -35,7 +37,7 @@ async function initTask() {
   checkLogIn();
   await includeHTML();
   await loadItems();
-  column = localStorage.getItem('column');
+  column = 'board_container_bottom_todo';
   await renderCategories();
   await renderContacts('contactContainer', 'Add');
   renderDueDate('Add');
@@ -49,7 +51,7 @@ async function loadItems() {
   try {
     await loadContactDropdown()
     await loadCategoryDropdown() // hier wieter mit frontend function für category 
-    // tasks = JSON.parse(await getItem("tasks"));
+    // await loadTasks()
     // freeColors = JSON.parse(await getItem("savedFreeColors"));
   } catch (e) {
     console.error("Loading error:", e);
@@ -197,15 +199,21 @@ function unassignContact(i, mode) {
  * this function adds assigned contacts to the global array assignedContacts
  * @param - no parameter
  */
-function updateAssignedContacts() {
+async function updateAssignedContacts() {
 
   assignedContacts = [];
   document.getElementById('contactAlert').innerHTML = '';
   for (let i = 0; i < assignedContactsStatus.length; i++) {
+    await loadContacts()
     const contact = contacts[i];
+    console.log(contacts)
+    console.log(i)
+    console.log(contact)
     const assignedStatus = assignedContactsStatus[i];
-    if (assignedStatus == true) {
+    if (assignedStatus) {
       assignedContacts.push(contact);
+    } else if (!assignedStatus){
+      assignedContacts.slice(i, 1)
     }
   }
   displayAssignedContacts();
@@ -218,13 +226,18 @@ function updateAssignedContacts() {
 function displayAssignedContacts() {
   const assignedContactsDisplay = document.getElementById('assignedContactsDisplay');
   assignedContactsDisplay.innerHTML = ''; // Zurücksetzen der Anzeige
+  console.error(assignedContacts)
   if (assignedContacts.length > 0) {
     for (const contact of assignedContacts) {
+      console.log(assignedContacts)
+      console.log(contact)
+      debugger;
       let newCircle = document.createElement('div');
       newCircle.classList.add('assignedContactsDisplayIcon');
       newCircle.style.backgroundColor = contact.color;
-      newCircle.innerHTML = contact.acronym;
-      newCircle.title = contact.user_name;
+      newCircle.innerHTML = contact['acronym'];
+      newCircle.title = contact['name']
+      
       assignedContactsDisplay.appendChild(newCircle);
     }
   }
@@ -327,6 +340,7 @@ function checkAddSubTask(id, mode) {
   } else {
     document.getElementById('subTaskAlertAdd').innerHTML = "";
     addSubTask(id, mode);
+    addSubtasks()
   }
 }
 
@@ -337,11 +351,12 @@ function checkAddSubTask(id, mode) {
  */
 function addSubTask(id, mode) {
   let subTaskName = document.getElementById(`inputSubtask${mode}`).value;
-  let subTaskDone = 0;
+  let subTaskDone = false;
   let subTask = {
-    'subTaskName': subTaskName,
-    'subTaskDone': subTaskDone
+    'name': subTaskName,
+    'checked': subTaskDone
   }
+  newSub = subTask
   subTasksArray.push(subTask);
   let index = findIndexOfItem(subTasksArray, subTask);
   document.getElementById(`subTasks${mode}`).innerHTML += /*html*/ `
@@ -375,10 +390,10 @@ function addCheck(index, id, mode) {
 
   if (existingImage) {
     checkBoxElement.removeChild(existingImage);
-    subTasksArray[index].subTaskDone = 0;
+    subTasksArray[index].subTaskDone = false;
   } else {
     document.getElementById(`checkBox${mode}${id}${index}`).innerHTML = /*html*/ `<img src="assets/img/done-30.png">`;
-    subTasksArray[index].subTaskDone = 1;
+    subTasksArray[index].subTaskDone = true;
   }
 }
 

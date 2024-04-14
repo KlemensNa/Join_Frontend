@@ -197,13 +197,69 @@ async function deleteCategoryInBackend(categoryName) {
   })
     .then(async response => {
       console.log('Category deleted');
-      loadContacts();
+      await loadContacts();
       await loadCategories();
     })
     .catch(error => {
       console.error('Fehler beim Löschen des Kontakts:', error);
     });
 }
+
+
+async function loadTasks() {
+
+  const url = "http://127.0.0.1:8000/task/";
+  await fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      tasks = data
+    })
+    .catch(error => {
+      console.error("Fehler beim Abrufen der Daten:", error);
+    })
+}
+
+
+async function saveSubtasks() {
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+
+  const raw = JSON.stringify(newSub);
+  console.log(subTasksArray)
+  console.warn(raw)
+
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow"
+  };
+
+  try {
+    let response = await fetch("http://127.0.0.1:8000/subtask/", requestOptions);
+    let resp = await response.json();
+    makeSubtasksPKArray(resp.id)
+  } catch (error) {
+    console.error("Error fetching JSON: ", error);
+  }
+}
+
+
+// async function loadTasks(id) {
+
+//   const url = `http://127.0.0.1:8000/subtask/${id}`;
+//   await fetch(url)
+//     .then(response => response.json())
+//     .then(data => {
+//       tasks = data
+//       console.log(tasks)
+//     })
+//     .catch(error => {
+//       console.error("Fehler beim Abrufen der Daten:", error);
+//     })
+// }
+
+
 
 /**
  * This help function finds the wanted contact.

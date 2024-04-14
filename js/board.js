@@ -3,6 +3,7 @@ let currentDraggedElement;
 
 async function renderBoard() {
     await renderBoardCards();
+
 }
 
 /**
@@ -10,11 +11,13 @@ async function renderBoard() {
  * load alle Datas from Backend, delete tasks columns and build new Cards out of loaded Datas
  */
 async function renderBoardCards() {
-    await loadItems();
-    await deleteBoard()
+
+    await deleteBoard();
+    await loadTasks();
     for (let i = 0; i < tasks.length; i++) {
         createBoardCard(i)
     }
+    await loadContacts()
     fillEmptyColumns();
 }
 
@@ -33,22 +36,39 @@ async function deleteBoard() {
  */
 async function createBoardCard(id) {
     //load position of the card 
+
     let task = tasks[id];
     let titleCard = task['title'];
     let descriptionCard = task['description'];
-    let categoryCard = task['category'];
-    let categoryColorCode = determineColorCategory(categoryCard);
-    let assignedCard = task['assignedContacts'];
+    let categoryCard = task['category'].name;
+    let categoryColorCode = task['category'].color;
+    let assignedUserNames = getAllAssignedUsers(task)
     let prioCard = task['prio'];
     let cats = task['column'];
     let subtaskCard = task['subtasks'];
     let idContainerAssignements = `board_icons_username${id}`;
 
+
     renderBoardCard(categoryCard, titleCard, descriptionCard, id, prioCard, cats, categoryColorCode);
     if (subtaskCard.length > 0) {
         createProgressbar(subtaskCard, id)
     };
-    createAssignmentIcons(assignedCard, idContainerAssignements);
+    createAssignmentIcons(assignedUserNames, idContainerAssignements);
+    contacts = []
+}
+
+
+function getAllAssignedUsers(task) {
+    let UserNameArray = [];
+    let allAssignedUsers = task['assigned_to'];
+
+    allAssignedUsers.forEach(element => {
+        UserNameArray.push(element)
+    });
+
+    console.warn(UserNameArray)
+
+    return UserNameArray
 }
 
 /**
@@ -74,11 +94,11 @@ function determineColorCategory(category) {
  * @param {*} attributes passes attributes of the task to create the template of this taskCard
  */
 function renderBoardCard(categoryCard, titleCard, descriptionCard, ID, prioCard, cats, categoryColorCode) {
-
+    console.log(categoryColorCode)
     let board_todo = document.getElementById(`${cats}`);
     board_todo.innerHTML += /*html*/`
         <div id="${ID}" draggable="true" ondragstart="startDragging(${ID})" 
-        onclick="openTaskOverview(${ID}, '${categoryCard}')" class="board_task_container" >
+        onclick="openTaskOverview(${ID})" class="board_task_container" >
             <div id="innerContainer${ID}" class="board_task_container_inner">
                 <div class="board_task_container_category" style="background-color: ${categoryColorCode}">${categoryCard}</div>
                 <div class="board_task_container_title_and_description">
@@ -98,27 +118,27 @@ function renderBoardCard(categoryCard, titleCard, descriptionCard, ID, prioCard,
             </div>
         </div> 
     `
-    if(isMobileDevice()){
-    renderMoveBtns(cats, ID);
+    if (isMobileDevice()) {
+        renderMoveBtns(cats, ID);
     }
 }
 
 
 
-function renderMoveBtns(cats, id){    
-        document.getElementById(`${id}`).innerHTML += /*html*/`
+function renderMoveBtns(cats, id) {
+    document.getElementById(`${id}`).innerHTML += /*html*/`
             <div class="lastCategory" onclick="moveToLastCat(${cats}, ${id}); stopPropagation(event)"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M7 14l5-5 5 5H7z"/></svg></div>
             <div class="nextCategory" onclick="moveToNextCat(${cats}, ${id}); stopPropagation(event)"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M7 10l5 5 5-5H7z"/></svg></div>
         `
-        if(cats == "board_container_bottom_todo"){
-            let lastCat = document.getElementById(`${id}`).getElementsByClassName("lastCategory");
-            lastCat[0].classList.add("d-none")
-        }
+    if (cats == "board_container_bottom_todo") {
+        let lastCat = document.getElementById(`${id}`).getElementsByClassName("lastCategory");
+        lastCat[0].classList.add("d-none")
+    }
 
-        if(cats == "board_container_bottom_done"){
-            let lastCat = document.getElementById(`${id}`).getElementsByClassName("nextCategory");
-            lastCat[0].classList.add("d-none")
-        }
+    if (cats == "board_container_bottom_done") {
+        let lastCat = document.getElementById(`${id}`).getElementsByClassName("nextCategory");
+        lastCat[0].classList.add("d-none")
+    }
 }
 
 
@@ -127,28 +147,28 @@ function stopPropagation(event) {
 }
 
 
-function moveToLastCat(column, id){
-    if(column.id == "board_container_bottom_inprogress"){
+function moveToLastCat(column, id) {
+    if (column.id == "board_container_bottom_inprogress") {
         newColumn = "board_container_bottom_todo"
     }
-    if(column.id == "board_container_bottom_awaitingfeedback"){
+    if (column.id == "board_container_bottom_awaitingfeedback") {
         newColumn = "board_container_bottom_inprogress"
     }
-    if(column.id == "board_container_bottom_done"){
+    if (column.id == "board_container_bottom_done") {
         newColumn = "board_container_bottom_awaitingfeedback"
     }
     changeTaskColumn(id, newColumn)
 }
 
 
-function moveToNextCat(column, id){
-    if(column.id == "board_container_bottom_inprogress"){
+function moveToNextCat(column, id) {
+    if (column.id == "board_container_bottom_inprogress") {
         newColumn = "board_container_bottom_awaitingfeedback"
     }
-    if(column.id == "board_container_bottom_todo"){
+    if (column.id == "board_container_bottom_todo") {
         newColumn = "board_container_bottom_inprogress"
     }
-    if(column.id == "board_container_bottom_awaitingfeedback"){
+    if (column.id == "board_container_bottom_awaitingfeedback") {
         newColumn = "board_container_bottom_done"
     }
     changeTaskColumn(id, newColumn)
@@ -178,7 +198,7 @@ function countDoneSubtasks(subtaskCard) {
     let counter = 0;
     for (let s = 0; s < subtaskCard.length; s++) {
         const sub = subtaskCard[s];
-        if (sub.subTaskDone == 1) {
+        if (sub.subTaskDone == true) {
             counter++
         }
     }
@@ -216,16 +236,17 @@ function renderProgressText(doneTasksNumber, tasksNumber, id) {
  * @param {*} assignedCard passes Array with names of the editors of the task
  * @param {*} id   passes id of the boardcard
  */
-function createAssignmentIcons(assignedCard, idContainer) {
-    for (let i = 0; i < assignedCard.length; i++) {
-        const assignedUser = assignedCard[i].user_name;
-
-        if(i < 5){
-        for (let k = 0; k < contacts.length; k++) {
-            const contact = contacts[k];
-            renderAssignmentIcons(assignedUser, contact, idContainer)
+function createAssignmentIcons(assignedUserNames, idContainer) {
+    contacts = []
+    for (let i = 0; i < assignedUserNames.length; i++) {
+        const assignedUser = assignedUserNames[i];
+        contacts.push(assignedUser)
+        if (i < 5) {
+            for (let k = 0; k < contacts.length; k++) {
+                const contact = contacts[k];
+                renderAssignmentIcons(assignedUser, contact, idContainer)
+            }
         }
-    }
     }
 }
 
@@ -237,12 +258,12 @@ function createAssignmentIcons(assignedCard, idContainer) {
  * @param {*} idContainer 
  */
 function renderAssignmentIcons(assignedUser, contact, idContainer) {
-    if (assignedUser === contact.user_name) {
+    if (assignedUser.name === contact.name) {
 
-        let acronym = createAcronym(assignedUser);
+        let acronym = createAcronym(assignedUser.name);
         let newCircle = document.createElement('div');
         newCircle.classList.add('board_Icons_Username');
-        newCircle.style.backgroundColor = getColor(assignedUser);
+        newCircle.style.backgroundColor = assignedUser.color;
         newCircle.innerHTML = acronym;
         newCircle.title = assignedUser;
 
@@ -283,27 +304,27 @@ function searchTasksOnBoardMobile() {
     let searchedTask = document.getElementById('board_input_mobile').value.toUpperCase();
     let searchingElements = document.getElementsByClassName('board_task_container_title');
 
-    searchFunction(searchedTask, searchingElements);    
+    searchFunction(searchedTask, searchingElements);
 }
 
 
-function searchTaskbyDescription(){
+function searchTaskbyDescription() {
     let searchedTask = document.getElementById('board_input').value.toUpperCase();
     let searchingElements = document.getElementsByClassName('board_task_container_description');
 
-    searchFunction(searchedTask, searchingElements);   
+    searchFunction(searchedTask, searchingElements);
 }
 
 
-function searchTaskbyDescriptionMobile(){
+function searchTaskbyDescriptionMobile() {
     let searchedTask = document.getElementById('board_input_mobile').value.toUpperCase();
     let searchingElements = document.getElementsByClassName('board_task_container_description');
 
-    searchFunction(searchedTask, searchingElements);   
+    searchFunction(searchedTask, searchingElements);
 }
 
 
-function searchFunction(searchedTask, searchingElements){
+function searchFunction(searchedTask, searchingElements) {
     for (let p = 0; p < searchingElements.length; p++) {
         let title = searchingElements[p];
         searchValue = title.textContent || title.innerText;
@@ -377,7 +398,7 @@ function fillEmptyColumns() {
     for (let c = 0; c < columnsToCheck.length; c++) {
         const column = columnsToCheck[c];
         let isEmpty = isDivEmpty(column)
-        if(isEmpty){
+        if (isEmpty) {
             document.getElementById(column).innerHTML = /*html*/`
                 <div class="emptyColumnContainer">No Tasks</div>
             `

@@ -10,7 +10,8 @@ function openTaskOverview(id, category) {
     column = task.column;
     assignedCategory = category;
     subTasksArray = task['subtasks'];
-    let colorCode = determineColorCategory(task['category']);
+    let colorCode = task["category"].color;
+    console.warn(task)
     renderEditOverviewTemplate(colorCode, task['prio'], id);
     let taskOverview = document.getElementById('editTask');
     taskOverview.classList.remove('d-none');
@@ -25,10 +26,10 @@ function openTaskOverview(id, category) {
  * @param {*} id task id
  */
 function renderTaskOverview(task, id) {
-    document.getElementById('editTaskContainerCategory').innerHTML = `${task['category']}`;
+    document.getElementById('editTaskContainerCategory').innerHTML = `${task['category'].name}`;
     document.getElementById('editTaskContainerTitle').innerHTML = `${task['title']}`;
     document.getElementById('editTaskContainerDescription').innerHTML = `${task['description']}`;
-    document.getElementById('editTaskContainerDueDateDate').innerHTML = `${task['dueDate']}`;
+    document.getElementById('editTaskContainerDueDateDate').innerHTML = `${task['due_date']}`;
     document.getElementById('editTaskContainerDelete').innerHTML = `<img src="assets/img/Icon_delete.png" onclick="askBeforeDelete(${id})">`;
     document.getElementById('editTaskContainerPrioPrio').innerHTML = `${task['prio']} <img src="assets/img/${task['prio']}_white.png"/>`;
 }
@@ -44,7 +45,7 @@ function renderEditOverviewTemplate(colorCode, prio, id) {
         <div id="confirmDeleteTask" class="d-none">
         </div>
         <div id="editTaskContainer" >
-            <div id="editTaskContainerClose" onclick="saveBoard(${id})"><img src="assets/img/Icon_close.png" alt="">
+            <div id="editTaskContainerClose" onclick="closeEditTask()"><img src="assets/img/Icon_close.png" alt="">
             </div>
             <div id="editTaskContainerEditDelete">
                 <div id="editTaskContainerDelete"></div>
@@ -82,32 +83,32 @@ function renderEditOverviewTemplate(colorCode, prio, id) {
  * @param {*} idContainer container to render in
  */
 function renderAssignementsInTaskOverview(task, idContainer) {
-    let assignedUsers = task['assignedContacts'];
+    let assignedUsers = task['assigned_to'];
+    
     document.getElementById(`${idContainer}`).innerHTML = "";
     for (let i = 0; i < assignedUsers.length; i++) {
         const assignedUser = assignedUsers[i];
-
-        for (let k = 0; k < contacts.length; k++) {
-            const contact = contacts[k];
-            renderAssignmentIconsInCard(assignedUser, contact, idContainer);
-        }
+        console.log(contacts)
+                    
+        renderAssignmentIconsInCard(assignedUser, idContainer);
+        
     }
 }
 
 /**
  * compares if assignedUser is an User in contact List --> creates and IconCircle
  * @param {*} assignedUser 
- * @param {*} contact 
  * @param {*} idContainer 
  */
-function renderAssignmentIconsInCard(assignedUser, contact, idContainer) {
-    if (assignedUser.user_name === contact.user_name) {
+function renderAssignmentIconsInCard(assignedUser, idContainer) {
+
+    // if (assignedUser.user_name === contact.user_name) {
 
         let newContainer = document.createElement('div');
         newContainer.classList.add('editTaskUsername');
         let newCircle = document.createElement('div');
         newCircle.classList.add('editTaskUsernameCircle');
-        newCircle.style.backgroundColor = getColor(assignedUser.user_name);
+        newCircle.style.backgroundColor = assignedUser.color;
         let newName = document.createElement('div');
         newName.classList.add('editTaskUsernameName');
 
@@ -117,9 +118,9 @@ function renderAssignmentIconsInCard(assignedUser, contact, idContainer) {
         newContainer.appendChild(newName);
         newCircle.innerHTML = assignedUser.acronym;
 
-        newName.innerHTML = assignedUser.user_name;
+        newName.innerHTML = assignedUser.name;
         un.appendChild(newContainer);
-    }
+    // }
 }
 
 /**
@@ -130,7 +131,8 @@ async function renderSubtasksInTaskOverview(id) {
     document.getElementById('editTaskContainerSubtasksTasks').innerHTML = "";
 
     for (let s = 0; s < subTasksArray.length; s++) {
-        if (subTasksArray[s].subTaskDone == 0) {
+        console.log(subTasksArray)
+        if (!subTasksArray[s].subTaskDone ) {
             renderSubtasksWithoutHook(s, id);
         } else {
             renderSubtasksWithHook(s, id);
@@ -163,7 +165,7 @@ function renderSubtasksWithoutHook(index, id) {
     document.getElementById('editTaskContainerSubtasksTasks').innerHTML += /*html*/`
             <div class="subtaskInOverview">
                 <div id="checkBoxEdit${id}${index}" class="checkBox hover" onclick="addCheck(${index}, ${id},'Edit')"></div>
-                <div class="checkboxTitle">${subTasksArray[index].subTaskName}</div>
+                <div class="checkboxTitle">${subTasksArray[index].name}</div>
             </div>
         `
 }
@@ -177,7 +179,7 @@ function renderSubtasksWithHook(index, id) {
     document.getElementById('editTaskContainerSubtasksTasks').innerHTML += /*html*/`
             <div class="subtaskInOverview">
                 <div id="checkBoxEdit${id}${index}" class="checkBox hover" onclick="addCheck(${index},${id},'Edit')"><img src="assets/img/done-30.png"></div>
-                <div>${subTasksArray[index].subTaskName}</div>
+                <div>${subTasksArray[index].mame}</div>
             </div>
         `
 }
@@ -189,10 +191,10 @@ function renderSubtasksWithHook(index, id) {
  */
 async function addSubTaskEdit(id) {
     let subTaskName = document.getElementById("inputSubtaskEdit").value;
-    let subTaskDone = 0;
+    let subTaskDone = false;
     let subTask = {
-        'subTaskName': subTaskName,
-        'subTaskDone': subTaskDone
+        'name': subTaskName,
+        'checked': subTaskDone
     }
     subTasksArray.push(subTask);
     renderSubtasksInTaskOverview(id);
@@ -313,7 +315,7 @@ function renderEditModeTemplates(task, id) {
             </div>
 </form>
     `
-    let assignedCard = task['assignedContacts'];
+    let assignedCard = task['assigned_to'];
     renderContacts('editContactContainer', 'Edit');
     renderDueDate('Edit');
     renderContactsAssignContacts(assignedCard);
@@ -341,13 +343,14 @@ function editPrio(chosenPrio, modus, id) {
  */
 function renderContactsAssignContacts(assContacts) {
     let searchArea = document.getElementsByClassName("contactList");
+    console.log(assContacts)
     for (let c = 0; c < assContacts.length; c++) {
         const assContact = assContacts[c];
         for (let d = 0; d < searchArea.length; d++) {
             const searchElement = searchArea[d];
             searchValue = searchElement.textContent || searchElement.innerText;
 
-            if (searchValue.indexOf(assContact.user_name) > -1) {
+            if (searchValue.indexOf(assContact.name) > -1) {
                 classContainer = d;
                 assignContact(d, 'Edit')
             }
