@@ -244,11 +244,6 @@ function displayAssignedContacts() {
 }
 
 
-function renderDisplayedContactsIcon() {
-
-}
-
-
 /**
  * this function links to the contact page to add a new contact
  * @param - no parameter
@@ -388,12 +383,15 @@ function addCheck(index, id, mode) {
   const checkBoxElement = document.getElementById(`checkBox${mode}${id}${index}`);
   const existingImage = checkBoxElement.querySelector('img');
 
+  
+
   if (existingImage) {
     checkBoxElement.removeChild(existingImage);
-    subTasksArray[index].subTaskDone = false;
+    subTasksArray[index].checked = false;
   } else {
     document.getElementById(`checkBox${mode}${id}${index}`).innerHTML = /*html*/ `<img src="assets/img/done-30.png">`;
-    subTasksArray[index].subTaskDone = true;
+    subTasksArray[index].checked = true;
   }
+  changeSubtaskStatus(subTasksArray[index], subTasksArray[index].id, id)
 }
 

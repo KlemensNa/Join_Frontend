@@ -206,6 +206,9 @@ async function deleteCategoryInBackend(categoryName) {
 }
 
 
+/**
+ * TASKS
+ */
 async function loadTasks() {
 
   const url = "http://127.0.0.1:8000/task/";
@@ -219,7 +222,58 @@ async function loadTasks() {
     })
 }
 
+async function changeTask(task ,id) {
 
+  const url = `http://127.0.0.1:8000/task/${id}/`;
+  newTask= makePks(task);
+
+    fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(task),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(async data => {
+        console.log('Erfolgreich aktualisiert:', data);
+        await loadTasks();
+        renderBoardCards();
+      })
+      .catch(error => {
+        console.error('Fehler beim Aktualisieren:', error);
+      });
+}
+
+
+function makePks(task){
+  console.log(task)
+  task['assigned_to'] = makePKArray(task['assigned_to'])
+  task['category'] = task['category'].id
+  task['subtasks'] = makePKArray(task['subtasks'])
+  console.log(task)
+}
+
+
+function makePKArray(array){
+  let pkArray = [];
+  array.forEach(element => {
+    pkArray.push(element.id)
+  });
+
+  return pkArray
+}
+
+
+
+/**
+ * SUBTASKS
+ */
 async function saveSubtasks() {
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
@@ -245,19 +299,32 @@ async function saveSubtasks() {
 }
 
 
-// async function loadTasks(id) {
+async function changeSubtaskStatus(subtask, id, cardID) {
 
-//   const url = `http://127.0.0.1:8000/subtask/${id}`;
-//   await fetch(url)
-//     .then(response => response.json())
-//     .then(data => {
-//       tasks = data
-//       console.log(tasks)
-//     })
-//     .catch(error => {
-//       console.error("Fehler beim Abrufen der Daten:", error);
-//     })
-// }
+  const url = `http://127.0.0.1:8000/subtask/${id}/`;
+
+    fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(subtask),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(async data => {
+        console.log('Erfolgreich aktualisiert:', data);
+        await loadTasks();
+        renderBoardCards();
+      })
+      .catch(error => {
+        console.error('Fehler beim Aktualisieren:', error);
+      });
+}
 
 
 

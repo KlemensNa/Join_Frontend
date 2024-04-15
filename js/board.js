@@ -66,8 +66,6 @@ function getAllAssignedUsers(task) {
         UserNameArray.push(element)
     });
 
-    console.warn(UserNameArray)
-
     return UserNameArray
 }
 
@@ -94,7 +92,6 @@ function determineColorCategory(category) {
  * @param {*} attributes passes attributes of the task to create the template of this taskCard
  */
 function renderBoardCard(categoryCard, titleCard, descriptionCard, ID, prioCard, cats, categoryColorCode) {
-    console.log(categoryColorCode)
     let board_todo = document.getElementById(`${cats}`);
     board_todo.innerHTML += /*html*/`
         <div id="${ID}" draggable="true" ondragstart="startDragging(${ID})" 
@@ -198,7 +195,7 @@ function countDoneSubtasks(subtaskCard) {
     let counter = 0;
     for (let s = 0; s < subtaskCard.length; s++) {
         const sub = subtaskCard[s];
-        if (sub.subTaskDone == true) {
+        if (sub.checked == true) {
             counter++
         }
     }
@@ -364,8 +361,7 @@ async function moveTo(category) {
 async function changeTaskColumn(taskIndex, newColumn) {
     if (taskIndex >= 0 && taskIndex < tasks.length) {
         tasks[taskIndex].column = newColumn;
-        await saveTask();
-        renderBoard();
+        changeTask(tasks[taskIndex], tasks[taskIndex].id);
     }
 }
 

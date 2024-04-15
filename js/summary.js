@@ -13,7 +13,7 @@ let newSummaryDueDate;
  */
 async function loadSummary(){
     checkLogIn();
-    // await loadItems();    
+    await loadTasks();    
     await countTasks();       
     greetingSummary(); 
 }
@@ -23,6 +23,7 @@ async function loadSummary(){
  * determine amounts of tasks
  */
 async function countTasks(){    
+    
     for (let t = 0; t < tasks.length; t++) {
         const task = tasks[t];
         let column = task.column;

@@ -88,7 +88,6 @@ function renderAssignementsInTaskOverview(task, idContainer) {
     document.getElementById(`${idContainer}`).innerHTML = "";
     for (let i = 0; i < assignedUsers.length; i++) {
         const assignedUser = assignedUsers[i];
-        console.log(contacts)
                     
         renderAssignmentIconsInCard(assignedUser, idContainer);
         
@@ -132,7 +131,7 @@ async function renderSubtasksInTaskOverview(id) {
 
     for (let s = 0; s < subTasksArray.length; s++) {
         console.log(subTasksArray)
-        if (!subTasksArray[s].subTaskDone ) {
+        if (!subTasksArray[s].checked ) {
             renderSubtasksWithoutHook(s, id);
         } else {
             renderSubtasksWithHook(s, id);
@@ -246,7 +245,6 @@ function closeEditTask() {
     enableBackgroundScroll();
     document.getElementById('editTask').classList.add('d-none');
     flushSubtasks();
-
 }
 
 
@@ -388,6 +386,7 @@ async function saveEditedBoard(id) {
         flushSubtasks();
     }
 }
+
 
 async function saveBoard(id) {
         tasks[id]['subtasks'] = subTasksArray;
