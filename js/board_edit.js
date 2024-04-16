@@ -1,5 +1,6 @@
 let prioToEdit;
-
+let catEditedTask;
+let IdEditedTask;
 /**
  * opens a card, which shows the detailed task
  * @param {*} id index of task which was clicked
@@ -11,7 +12,6 @@ function openTaskOverview(id, category) {
     assignedCategory = category;
     subTasksArray = task['subtasks'];
     let colorCode = task["category"].color;
-    console.warn(task)
     renderEditOverviewTemplate(colorCode, task['prio'], id);
     let taskOverview = document.getElementById('editTask');
     taskOverview.classList.remove('d-none');
@@ -84,13 +84,13 @@ function renderEditOverviewTemplate(colorCode, prio, id) {
  */
 function renderAssignementsInTaskOverview(task, idContainer) {
     let assignedUsers = task['assigned_to'];
-    
+
     document.getElementById(`${idContainer}`).innerHTML = "";
     for (let i = 0; i < assignedUsers.length; i++) {
         const assignedUser = assignedUsers[i];
-                    
+
         renderAssignmentIconsInCard(assignedUser, idContainer);
-        
+
     }
 }
 
@@ -103,22 +103,22 @@ function renderAssignmentIconsInCard(assignedUser, idContainer) {
 
     // if (assignedUser.user_name === contact.user_name) {
 
-        let newContainer = document.createElement('div');
-        newContainer.classList.add('editTaskUsername');
-        let newCircle = document.createElement('div');
-        newCircle.classList.add('editTaskUsernameCircle');
-        newCircle.style.backgroundColor = assignedUser.color;
-        let newName = document.createElement('div');
-        newName.classList.add('editTaskUsernameName');
+    let newContainer = document.createElement('div');
+    newContainer.classList.add('editTaskUsername');
+    let newCircle = document.createElement('div');
+    newCircle.classList.add('editTaskUsernameCircle');
+    newCircle.style.backgroundColor = assignedUser.color;
+    let newName = document.createElement('div');
+    newName.classList.add('editTaskUsernameName');
 
-        let un = document.getElementById(idContainer);
+    let un = document.getElementById(idContainer);
 
-        newContainer.appendChild(newCircle);
-        newContainer.appendChild(newName);
-        newCircle.innerHTML = assignedUser.acronym;
+    newContainer.appendChild(newCircle);
+    newContainer.appendChild(newName);
+    newCircle.innerHTML = assignedUser.acronym;
 
-        newName.innerHTML = assignedUser.name;
-        un.appendChild(newContainer);
+    newName.innerHTML = assignedUser.name;
+    un.appendChild(newContainer);
     // }
 }
 
@@ -130,8 +130,7 @@ async function renderSubtasksInTaskOverview(id) {
     document.getElementById('editTaskContainerSubtasksTasks').innerHTML = "";
 
     for (let s = 0; s < subTasksArray.length; s++) {
-        console.log(subTasksArray)
-        if (!subTasksArray[s].checked ) {
+        if (!subTasksArray[s].checked) {
             renderSubtasksWithoutHook(s, id);
         } else {
             renderSubtasksWithHook(s, id);
@@ -178,7 +177,7 @@ function renderSubtasksWithHook(index, id) {
     document.getElementById('editTaskContainerSubtasksTasks').innerHTML += /*html*/`
             <div class="subtaskInOverview">
                 <div id="checkBoxEdit${id}${index}" class="checkBox hover" onclick="addCheck(${index},${id},'Edit')"><img src="assets/img/done-30.png"></div>
-                <div>${subTasksArray[index].mame}</div>
+                <div>${subTasksArray[index].name}</div>
             </div>
         `
 }
@@ -230,7 +229,7 @@ async function deleteTaskFinally(id) {
     renderBoardCards();
     closeEditTask();
     flushSubtasks();
-    
+
 }
 
 
@@ -254,12 +253,15 @@ function openEditMode(id) {
     renderEditModeTemplates(task, id);
 }
 
+
 /**
  * render Edit Container 
  * @param {*} task 
  * @param {*} id 
  */
 function renderEditModeTemplates(task, id) {
+    IdEditedTask = task['id']
+    catEditedTask = task['category']
     let editTask = document.getElementById('editTask');
     editTask.innerHTML = "";
     editTask.innerHTML = /*html*/`
@@ -286,7 +288,7 @@ function renderEditModeTemplates(task, id) {
                             class="inputsAddTask height51 padding hover"
                             type="date"
                             required
-                            value="${task['dueDate']}"       
+                            value="${task['due_date']}"       
                             />
                 </div> 
                 <div id="editTaskPrio" class="editTaskTitleFixed editTasksWidth80">
@@ -333,7 +335,7 @@ function editPrio(chosenPrio, modus, id) {
         prioToEdit = chosenPrio;
     }
     renderAssignedPrio(chosenPrio, modus);
-  }
+}
 
 /**
  * 
@@ -341,7 +343,6 @@ function editPrio(chosenPrio, modus, id) {
  */
 function renderContactsAssignContacts(assContacts) {
     let searchArea = document.getElementsByClassName("contactList");
-    console.log(assContacts)
     for (let c = 0; c < assContacts.length; c++) {
         const assContact = assContacts[c];
         for (let d = 0; d < searchArea.length; d++) {
@@ -362,7 +363,8 @@ function renderContactsAssignContacts(assContacts) {
  * save edited Task, close EditMode and render board
  * @param {*} id 
  */
-async function saveEditedBoard(id) {
+async function saveEditedBoard(id, cat) {
+
     let prioFilled = checkEditedPrio();
     let correctContact = checkCorrectContact();
     if (prioFilled == true && correctContact == true) {
@@ -370,30 +372,30 @@ async function saveEditedBoard(id) {
         let description = document.getElementById("editTaskDescriptionChangable").value;
         let dueDate = document.getElementById("dueDateEdit").value;
         let task = {
+            'id': IdEditedTask,
             'title': title,
             'description': description,
-            'category': assignedCategory,
-            'assignedContacts': assignedContacts,
-            'dueDate': dueDate,
+            'category': catEditedTask,
+            'assigned_to': assignedContacts,
+            'due_date': dueDate,
             'prio': prioToEdit,
             'column': column,
             'subtasks': subTasksArray,
         }
         tasks[id] = task;
-        await saveTask();
+        updateTask(task, IdEditedTask);
         closeEditTask();
-        await renderBoardCards();
         flushSubtasks();
     }
 }
 
 
 async function saveBoard(id) {
-        tasks[id]['subtasks'] = subTasksArray;
-        await saveTask();
-        closeEditTask();
-        await renderBoardCards();
-        flushSubtasks();
+    tasks[id]['subtasks'] = subTasksArray;
+    await saveTask();
+    closeEditTask();
+    await renderBoardCards();
+    flushSubtasks();
 }
 
 /**
@@ -402,24 +404,24 @@ async function saveBoard(id) {
 */
 function checkEditedPrio() {
     if (typeof prioToEdit !== 'undefined' && prioToEdit !== null && prioToEdit !== '') {
-      return true;
+        return true;
     } else {
-     document.getElementById(`prioAlertEdit`).innerHTML ='Please select a priority!';
+        document.getElementById(`prioAlertEdit`).innerHTML = 'Please select a priority!';
     }
-  }
+}
 
 function preventBackgroundScroll() {
-        document.getElementById('board').style.overflow = 'hidden'; 
+    document.getElementById('board').style.overflow = 'hidden';
 }
 
 
 function enableBackgroundScroll() {
-    document.getElementById('board').style.overflow = ''; 
+    document.getElementById('board').style.overflow = '';
 }
 
 
 function disableBackgroundScroll() {
-        preventBackgroundScroll();
+    preventBackgroundScroll();
 }
 
 

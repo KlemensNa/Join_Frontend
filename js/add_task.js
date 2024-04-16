@@ -48,11 +48,10 @@ async function initTask() {
  * @param - no parameter
  */
 async function loadItems() {
+    checkLogIn()
   try {
     await loadContactDropdown()
-    await loadCategoryDropdown() // hier wieter mit frontend function für category 
-    // await loadTasks()
-    // freeColors = JSON.parse(await getItem("savedFreeColors"));
+    await loadCategoryDropdown() 
   } catch (e) {
     console.error("Loading error:", e);
   }
@@ -206,9 +205,6 @@ async function updateAssignedContacts() {
   for (let i = 0; i < assignedContactsStatus.length; i++) {
     await loadContacts()
     const contact = contacts[i];
-    console.log(contacts)
-    console.log(i)
-    console.log(contact)
     const assignedStatus = assignedContactsStatus[i];
     if (assignedStatus) {
       assignedContacts.push(contact);
@@ -226,12 +222,9 @@ async function updateAssignedContacts() {
 function displayAssignedContacts() {
   const assignedContactsDisplay = document.getElementById('assignedContactsDisplay');
   assignedContactsDisplay.innerHTML = ''; // Zurücksetzen der Anzeige
-  console.error(assignedContacts)
   if (assignedContacts.length > 0) {
     for (const contact of assignedContacts) {
-      console.log(assignedContacts)
-      console.log(contact)
-      debugger;
+      
       let newCircle = document.createElement('div');
       newCircle.classList.add('assignedContactsDisplayIcon');
       newCircle.style.backgroundColor = contact.color;

@@ -2,8 +2,8 @@
 let currentDraggedElement;
 
 async function renderBoard() {
+    checkLogIn()
     await renderBoardCards();
-
 }
 
 /**
@@ -361,7 +361,7 @@ async function moveTo(category) {
 async function changeTaskColumn(taskIndex, newColumn) {
     if (taskIndex >= 0 && taskIndex < tasks.length) {
         tasks[taskIndex].column = newColumn;
-        changeTask(tasks[taskIndex], tasks[taskIndex].id);
+        updateTask(tasks[taskIndex], tasks[taskIndex].id);
     }
 }
 

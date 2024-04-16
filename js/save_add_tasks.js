@@ -38,7 +38,6 @@ async function createTask(event) {
   let correctCategory = checkCorrectCategory();
   let correctContact = checkCorrectContact();
   let contactPKs = makeContacktPKArray();
-  console.warn(subTasksIDs)
   if (prioFilled == true && correctCategory == true && correctContact == true) {
     let title = document.getElementById("title").value;
     let description = document.getElementById("description").value;
@@ -161,7 +160,6 @@ async function saveTask(task) {
   myHeaders.append("Content-Type", "application/json");
 
   task = JSON.stringify(task)
-  console.warn(task)
 
   const requestOptions = {
     method: "POST",
@@ -172,16 +170,7 @@ async function saveTask(task) {
 
   await fetch(STORAGE_URL + "task/", requestOptions)
     .then((response) => response.text())
-    .then((response) => console.warn(response))
-    // .then(resetAddContactsForm(), closeModal(id))
     .catch((error) => console.error(error));
-
-
-
-
-  // await setItem("tasks", JSON.stringify(tasks));
-  // await setItem("savedCategories", JSON.stringify(categories));
-  // await setItem("savedFreeColors", JSON.stringify(freeColors));
 }
 
 /**

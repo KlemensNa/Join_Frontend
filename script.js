@@ -30,7 +30,6 @@ async function loginUser() {
     redirect: "follow"
   };
 
-  console.log(requestOptions)
 
   try {
     const response = await fetch("http://127.0.0.1:8000/login/", requestOptions);
@@ -41,28 +40,29 @@ async function loginUser() {
     localStorage.setItem('token', token)
     localStorage.setItem('currentUser', username)
     localStorage.setItem(`loggedIn`, true);
-    window.location.href = "./summary.html"; // Hier kannst du die Antwort verarbeiten
+    if (token) {
+      window.location.href = "./summary.html"; 
+  } else {
+      alert("Username oder Password falsch. Bitte versuche es nochmal")
+      console.error("Ungültiger Token. Bitte erneut anmelden.");
+  }
   } catch (error) {
     console.error(error);
-  }
-
-
-  
+  }  
 }
 
 function guestUser() {
-  // localStorage.setItem(`currentUser`, `Guest`);
-  // window.location.href = "summary.html";
-  // localStorage.setItem(`loggedIn`, true);
-
+  email.value = "Guest";
+  password.value = "Klemens1";  
+    loginUser()  
 }
 
 
 function checkLogIn() {
   let LogInStatus = localStorage.getItem(`loggedIn`);
   if (LogInStatus == 'false') {
-    alert('Please Log In to view this Page.');
-    setTimeout(window.location.href = "index.html", 2000);
+      window.location.href = "index.html"
+      alert('Please Log In to view this Page.');
   }
 }
 

@@ -51,16 +51,12 @@ function askBeforeDeleteCategory(categoryToDelete, i) {
  */
 async function deleteCategory(categoryToDelete, i) {
   checkCategoryIfUsed = checkCategoryToDelete(categoryToDelete);
-  console.warn(checkCategoryIfUsed)
   if (checkCategoryIfUsed === false) {
     await deleteCategoryInBackend(categoryToDelete)
-    categories.splice(i, 1)
-    
+    categories.splice(i, 1)    
 
     document.getElementById("categoryAlert").innerHTML = "";
     await renderCategories();
-    
-    //saveOnlyCategories(); --> kann weg
   } else {
     document.getElementById("categoryAlert").innerHTML = "Category is in use";
   }
