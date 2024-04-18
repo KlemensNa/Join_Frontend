@@ -1,6 +1,30 @@
 const STORAGE_URL = "http://127.0.0.1:8000/";
 let taskToDeleteSub;
 
+
+async function loadAllUsers() {
+
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+
+  const requestOptions = {
+    method: "GET",
+    headers: myHeaders,
+  }
+
+  const url = "http://127.0.0.1:8000/login/";
+  await fetch(url, requestOptions)
+    .then(response => response.text())
+    .then(data => {
+      allUsersToCheck = JSON.parse(data)
+    })
+    .catch(error => {
+      console.error("Fehler beim Abrufen der Daten:", error);
+    })
+}
+
+
+
 /**
  * CONTACTS
  * 
@@ -8,8 +32,17 @@ let taskToDeleteSub;
 
 async function loadContacts() {
 
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+  myHeaders.append('Authorization', 'Token ' + localStorage.getItem('token'))
+
+  const requestOptions = {
+    method: "GET",
+    headers: myHeaders,
+  }
+
   const url = "http://127.0.0.1:8000/contact/";
-  await fetch(url)
+  await fetch(url, requestOptions)
     .then(response => response.text())
     .then(data => {
       contacts = JSON.parse(data)
@@ -28,6 +61,7 @@ async function loadContacts() {
 async function createContact(id) {
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
+  myHeaders.append('Authorization', 'Token ' + localStorage.getItem('token'))
 
   let acronym = createAcronym(user_name.value);
 
@@ -71,6 +105,7 @@ async function saveEditedContact() {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': 'Token ' + localStorage.getItem('token'),
     },
     body: JSON.stringify(updatedContactData),
   })
@@ -81,7 +116,6 @@ async function saveEditedContact() {
       return response.json();
     })
     .then(async data => {
-      console.log('Erfolgreich aktualisiert:', data);
       closeModal("edit_contact_modal");
       await loadContacts();
       renderContact(edit_name.value)
@@ -105,9 +139,11 @@ async function deleteContact(username) {
 
   fetch(STORAGE_URL + `contact/${contactId}/`, {
     method: 'DELETE',
+    headers: {
+      'Authorization': 'Token ' + localStorage.getItem('token'),
+    }
   })
     .then(async response => {
-      console.log('Kontakt erfolgreich gelöscht');
       await loadContacts();
       await renderContactList();
       renderEmptyContact();
@@ -126,7 +162,13 @@ async function deleteContact(username) {
 
 async function loadCategories() {
   const url = "http://127.0.0.1:8000/category/";
-  await fetch(url)
+
+  const requestOptions = {
+    method: "GET",
+    headers: myHeaders,
+  }
+
+  await fetch(url, requestOptions)
     .then(response => response.text())
     .then(data => {
       categories = JSON.parse(data)
@@ -140,6 +182,7 @@ async function loadCategories() {
 async function addNewCategory() {
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
+  myHeaders.append('Authorization', 'Token ' + localStorage.getItem('token'))
 
   const raw = JSON.stringify({
     "color": newCategoryColor,
@@ -166,9 +209,11 @@ async function deleteCategoryInBackend(categoryName) {
 
   fetch(STORAGE_URL + `category/${catID}/`, {
     method: 'DELETE',
+    headers: {
+      'Authorization': 'Token ' + localStorage.getItem('token'),
+    }
   })
     .then(async response => {
-      console.log('Category deleted');
       await loadContacts();
       await loadCategories();
     })
@@ -183,8 +228,17 @@ async function deleteCategoryInBackend(categoryName) {
  */
 async function loadTasks() {
 
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+  myHeaders.append('Authorization', 'Token ' + localStorage.getItem('token'))
+
+  const requestOptions = {
+    method: "GET",
+    headers: myHeaders,
+  }
+
   const url = "http://127.0.0.1:8000/task/";
-  await fetch(url)
+  await fetch(url, requestOptions)
     .then(response => response.json())
     .then(data => {
       tasks = data
@@ -197,8 +251,17 @@ async function loadTasks() {
 
 async function loadTask(id) {
 
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+  myHeaders.append('Authorization', 'Token ' + localStorage.getItem('token'))
+
+  const requestOptions = {
+    method: "GET",
+    headers: myHeaders,
+  }
+
   const url = `http://127.0.0.1:8000/task/${id}`;
-  await fetch(url)
+  await fetch(url, requestOptions)
     .then(response => response.json())
     .then(data => {
       taskToDeleteSub = data
@@ -218,6 +281,7 @@ async function updateTask(task ,id) {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': 'Token ' + localStorage.getItem('token'),
       },
       body: JSON.stringify(task),
     })
@@ -228,7 +292,6 @@ async function updateTask(task ,id) {
         return response.json();
       })
       .then(async data => {
-        console.log('Erfolgreich aktualisiert:', data);
         await loadTasks();
         renderBoardCards();
       })
@@ -242,9 +305,12 @@ async function deleteTask(taskID) {
 
   fetch(STORAGE_URL + `task/${taskID}/`, {
     method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Token ' + localStorage.getItem('token'),
+    },
   })
     .then(async response => {
-      console.log('Task erfolgreich gelöscht');
       await loadTasks()
       renderBoardCards()
     })
@@ -278,6 +344,7 @@ function makePKArray(array){
 async function saveSubtasks() {
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
+  myHeaders.append('Authorization', 'Token ' + localStorage.getItem('token'))
 
   const raw = JSON.stringify(newSub);
 
@@ -299,6 +366,7 @@ async function saveSubtasks() {
 
 
 async function changeSubtaskStatus(subtask, id, cardID) {
+  
 
   const url = `http://127.0.0.1:8000/subtask/${id}/`;
 
@@ -306,6 +374,7 @@ async function changeSubtaskStatus(subtask, id, cardID) {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': 'Token ' + localStorage.getItem('token'),
       },
       body: JSON.stringify(subtask),
     })
@@ -316,7 +385,6 @@ async function changeSubtaskStatus(subtask, id, cardID) {
         return response.json();
       })
       .then(async data => {
-        console.log('Erfolgreich aktualisiert:', data);
         await loadTasks();
         renderBoardCards();
       })
@@ -330,9 +398,12 @@ async function deleteSubtask(id) {
 
   fetch(STORAGE_URL + `subtask/${id}/`, {
     method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Token ' + localStorage.getItem('token'),
+    },
   })
     .then(async response => {
-      console.log('Subtask erfolgreich gelöscht');
     })
     .catch(error => {
       console.error('Fehler beim Löschen des Kontakts:', error);

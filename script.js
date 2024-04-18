@@ -1,8 +1,32 @@
 let currentUser;
+let allUsersToCheck;
+let allUserNames = []
 
 function init() {
   loadCache();
-  createGuestUser()  
+  lookingForGuest()
+}
+
+
+/**
+ * function to create a guest, wenn backend is empty
+ * look for User Guest in allUsers --> if exists do nothing, else create newGuestUser
+ * 
+ * @returns 
+ */
+async function lookingForGuest(){
+  await loadAllUsers()
+
+  allUsersToCheck.forEach(element => {
+    let nami = element['username']
+    allUserNames.push(nami)
+  });
+
+  if(allUserNames.includes('Guest')){
+    return
+  } else {
+    await createGuestUser()
+  }
 }
 
 async function loadUser() {
@@ -44,8 +68,15 @@ async function loginUser() {
     if (token) {
       window.location.href = "./summary.html";
     } else {
-      alert("Username oder Password falsch. Bitte versuche es nochmal")
-      console.error("Ungültiger Token. Bitte erneut anmelden.");
+
+      if(email.value = "Guest"){
+        alert("Bitte lege in den Django Users einen Gastuser an --> Passwort Klemens1; Name:Guest")
+      } else {
+        alert("Username oder Password falsch. Bitte versuche es nochmal")
+      }
+
+
+
     }
   } catch (error) {
     console.error(error);
@@ -53,11 +84,13 @@ async function loginUser() {
 }
 
 
-function guestUser(){
+async function guestUser(){
   email.value = "Guest"
   password.value = "Klemens1"
-
-  loginUser()
+  
+  await loginUser()
+  
+  
 }
 
 
