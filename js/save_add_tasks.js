@@ -52,6 +52,7 @@ async function createTask(event) {
       subtasks: subTasksIDs,
       column: column,
     };
+    console.log(task)
     tasks.push(task);
     saveTask(task);
     flushSubtasks();
@@ -158,6 +159,7 @@ async function saveTask(task) {
 
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
+  myHeaders.append('Authorization', 'Token ' + localStorage.getItem('token'))
 
   task = JSON.stringify(task)
 

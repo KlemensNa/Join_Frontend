@@ -63,7 +63,6 @@ async function loadItems() {
  */
 async function loadContactDropdown() {
   await loadContacts();
-  // contacts = JSON.parse(contacts)
 }
 
 

@@ -163,6 +163,10 @@ async function deleteContact(username) {
 async function loadCategories() {
   const url = "http://127.0.0.1:8000/category/";
 
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+  myHeaders.append('Authorization', 'Token ' + localStorage.getItem('token'))
+
   const requestOptions = {
     method: "GET",
     headers: myHeaders,
@@ -198,7 +202,7 @@ async function addNewCategory() {
 
   fetch("http://127.0.0.1:8000/category/", requestOptions)
     .then((response) => response.text())
-    .then(async () => await loadCategories())
+    .then(async () => loadCategoryDropdown())
     .catch((error) => console.error(error));
 }
 
