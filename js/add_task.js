@@ -69,6 +69,8 @@ async function loadContactDropdown() {
 
 async function loadCategoryDropdown(){
   await loadCategories()
+  let addCat = {name: "Add new Category"}
+  categories.unshift(addCat)
 }
 
 
@@ -349,7 +351,7 @@ function addSubTask(id, mode) {
   let index = findIndexOfItem(subTasksArray, subTask);
   document.getElementById(`subTasks${mode}`).innerHTML += /*html*/ `
     <div class="subTaskBox">
-        <div id="checkBox${mode}${id}${index}" class="checkBox hover" onclick="addCheck(${index}, ${id}, '${mode}')"></div>
+        <div id="checkBox${mode}${id}${index}" class="checkBox hover d-none" onclick="addCheck(${index}, ${id}, '${mode}')"></div>
         <div class="subtask">${subTaskName}</div>
     </div>`;
   document.getElementById(`inputSubtask${mode}`).value = "";

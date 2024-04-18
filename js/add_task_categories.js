@@ -15,7 +15,6 @@ async function renderCategories() {
   renderCategoryOptions();
   resetCategories();
   document.getElementById('categoryAlert').innerHTML ='';
-
 }
 
 

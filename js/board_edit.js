@@ -30,7 +30,7 @@ function renderTaskOverview(task, id) {
     document.getElementById('editTaskContainerTitle').innerHTML = `${task['title']}`;
     document.getElementById('editTaskContainerDescription').innerHTML = `${task['description']}`;
     document.getElementById('editTaskContainerDueDateDate').innerHTML = `${task['due_date']}`;
-    document.getElementById('editTaskContainerDelete').innerHTML = `<img src="assets/img/Icon_delete.png" onclick="askBeforeDelete(${id})">`;
+    document.getElementById('editTaskContainerDelete').innerHTML = `<img src="assets/img/Icon_delete.png" onclick="askBeforeDelete(${task['id']})">`;
     document.getElementById('editTaskContainerPrioPrio').innerHTML = `${task['prio']} <img src="assets/img/${task['prio']}_white.png"/>`;
 }
 
@@ -207,13 +207,15 @@ async function addSubTaskEdit(id) {
  * confirm Container if task should be deleted
  * @param {*} a 
  */
-function askBeforeDelete(id) {
+function askBeforeDelete(taskID) {
+    console.log(taskID)
+    
     let confirmDelete = document.getElementById('confirmDeleteTask');
     confirmDelete.classList.remove('d-none');
     confirmDelete.innerHTML += /*html*/`
         <div id="confirmDeleteTaskQuestion">Delete Task?</div>
         <div id="confirmDeleteTaskAnswers">
-                <div id="confirmDeleteTaskAnswersYes" onclick="deleteTaskFinally(${id})">Delete</div>
+                <div id="confirmDeleteTaskAnswersYes" onclick="deleteTaskFinally(${taskID})">Delete</div>
                 <div id="confirmDeleteTaskAnswersNo" onclick="closeDeleteRequest()">Back</div>
         </div>
     `
@@ -224,12 +226,23 @@ function askBeforeDelete(id) {
  * @param {*} a 
  */
 async function deleteTaskFinally(id) {
-    closeDeleteRequest();
+    closeDeleteRequest();    
+    await deleteSubtasks(id)
     await deleteTask(id);
     renderBoardCards();
     closeEditTask();
     flushSubtasks();
 
+}
+
+
+async function deleteSubtasks(id){
+    await loadTask(id)
+    const subtasks = makePKArray(taskToDeleteSub['subtasks'])
+    
+    subtasks.forEach(element => {
+        deleteSubtask(element)
+    });
 }
 
 

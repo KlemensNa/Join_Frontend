@@ -1,11 +1,10 @@
 const STORAGE_URL = "http://127.0.0.1:8000/";
-
+let taskToDeleteSub;
 
 /**
  * CONTACTS
  * 
  */
-
 
 async function loadContacts() {
 
@@ -195,6 +194,21 @@ async function loadTasks() {
     })
 }
 
+
+async function loadTask(id) {
+
+  const url = `http://127.0.0.1:8000/task/${id}`;
+  await fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      taskToDeleteSub = data
+    })
+    .catch(error => {
+      console.error("Fehler beim Abrufen der Daten:", error);
+    })
+}
+
+
 async function updateTask(task ,id) {
 
   const url = `http://127.0.0.1:8000/task/${id}/`;
@@ -221,6 +235,22 @@ async function updateTask(task ,id) {
       .catch(error => {
         console.error('Fehler beim Aktualisieren:', error);
       });
+}
+
+
+async function deleteTask(taskID) {
+
+  fetch(STORAGE_URL + `task/${taskID}/`, {
+    method: 'DELETE',
+  })
+    .then(async response => {
+      console.log('Task erfolgreich gelöscht');
+      await loadTasks()
+      renderBoardCards()
+    })
+    .catch(error => {
+      console.error('Fehler beim Löschen des Kontakts:', error);
+    });
 }
 
 
@@ -295,6 +325,48 @@ async function changeSubtaskStatus(subtask, id, cardID) {
       });
 }
 
+
+async function deleteSubtask(id) {
+
+  fetch(STORAGE_URL + `subtask/${id}/`, {
+    method: 'DELETE',
+  })
+    .then(async response => {
+      console.log('Subtask erfolgreich gelöscht');
+    })
+    .catch(error => {
+      console.error('Fehler beim Löschen des Kontakts:', error);
+    });
+}
+
+
+async function createGuestUser() {
+
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+
+  const raw = JSON.stringify({
+    "username": "Guest",
+    "password": "Klemens1",
+    "email": "Guest"
+  });
+
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow"
+  };
+
+
+  try {
+    const response = await fetch("http://127.0.0.1:8000/register/", requestOptions);
+    const result = await response.text();
+  } catch (error) {
+    console.error(error);
+  }
+
+}
 
 
 /**

@@ -2,6 +2,7 @@ let currentUser;
 
 function init() {
   loadCache();
+  createGuestUser()  
 }
 
 async function loadUser() {
@@ -13,7 +14,7 @@ async function loadUser() {
 }
 
 async function loginUser() {
-  
+
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
 
@@ -41,28 +42,30 @@ async function loginUser() {
     localStorage.setItem('currentUser', username)
     localStorage.setItem(`loggedIn`, true);
     if (token) {
-      window.location.href = "./summary.html"; 
-  } else {
+      window.location.href = "./summary.html";
+    } else {
       alert("Username oder Password falsch. Bitte versuche es nochmal")
       console.error("Ungültiger Token. Bitte erneut anmelden.");
-  }
+    }
   } catch (error) {
     console.error(error);
-  }  
+  }
 }
 
-function guestUser() {
-  email.value = "Guest";
-  password.value = "Klemens1";  
-    loginUser()  
+
+function guestUser(){
+  email.value = "Guest"
+  password.value = "Klemens1"
+
+  loginUser()
 }
 
 
 function checkLogIn() {
   let LogInStatus = localStorage.getItem(`loggedIn`);
   if (LogInStatus == 'false') {
-      window.location.href = "index.html"
-      alert('Please Log In to view this Page.');
+    window.location.href = "index.html"
+    alert('Please Log In to view this Page.');
   }
 }
 
