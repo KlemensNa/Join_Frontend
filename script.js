@@ -57,7 +57,7 @@ async function loginUser() {
 
 
   try {
-    const response = await fetch("http://127.0.0.1:8000/login/", requestOptions);
+    const response = await fetch("https://joinapi.naueka.de/login/", requestOptions);
     const result = await response.text();
     const tokenJson = JSON.parse(result)
     const token = tokenJson.token;

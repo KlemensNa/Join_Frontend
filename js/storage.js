@@ -1,4 +1,4 @@
-const STORAGE_URL = "http://127.0.0.1:8000/";
+const STORAGE_URL = "https://joinapi.naueka.de";
 let taskToDeleteSub;
 
 
@@ -12,7 +12,7 @@ async function loadAllUsers() {
     headers: myHeaders,
   }
 
-  const url = "http://127.0.0.1:8000/login/";
+  const url = "https://joinapi.naueka.de/login/";
   await fetch(url, requestOptions)
     .then(response => response.text())
     .then(data => {
@@ -41,7 +41,7 @@ async function loadContacts() {
     headers: myHeaders,
   }
 
-  const url = "http://127.0.0.1:8000/contact/";
+  const url = "https://joinapi.naueka.de/contact/";
   await fetch(url, requestOptions)
     .then(response => response.text())
     .then(data => {
@@ -161,7 +161,7 @@ async function deleteContact(username) {
 
 
 async function loadCategories() {
-  const url = "http://127.0.0.1:8000/category/";
+  const url = "https://joinapi.naueka.de/category/";
 
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
@@ -200,7 +200,7 @@ async function addNewCategory() {
     redirect: "follow"
   };
 
-  fetch("http://127.0.0.1:8000/category/", requestOptions)
+  fetch("https://joinapi.naueka.de/category/", requestOptions)
     .then((response) => response.text())
     .then(async () => loadCategoryDropdown())
     .catch((error) => console.error(error));
@@ -241,7 +241,7 @@ async function loadTasks() {
     headers: myHeaders,
   }
 
-  const url = "http://127.0.0.1:8000/task/";
+  const url = "https://joinapi.naueka.de/task/";
   await fetch(url, requestOptions)
     .then(response => response.json())
     .then(data => {
@@ -264,7 +264,7 @@ async function loadTask(id) {
     headers: myHeaders,
   }
 
-  const url = `http://127.0.0.1:8000/task/${id}`;
+  const url = `https://joinapi.naueka.de/task/${id}`;
   await fetch(url, requestOptions)
     .then(response => response.json())
     .then(data => {
@@ -278,7 +278,7 @@ async function loadTask(id) {
 
 async function updateTask(task ,id) {
 
-  const url = `http://127.0.0.1:8000/task/${id}/`;
+  const url = `https://joinapi.naueka.de/task/${id}/`;
   newTask= makePks(task);
 
     fetch(url, {
@@ -360,7 +360,7 @@ async function saveSubtasks() {
   };
 
   try {
-    let response = await fetch("http://127.0.0.1:8000/subtask/", requestOptions);
+    let response = await fetch("https://joinapi.naueka.de/subtask/", requestOptions);
     let resp = await response.json();
     makeSubtasksPKArray(resp.id)
   } catch (error) {
@@ -372,7 +372,7 @@ async function saveSubtasks() {
 async function changeSubtaskStatus(subtask, id, cardID) {
   
 
-  const url = `http://127.0.0.1:8000/subtask/${id}/`;
+  const url = `https://joinapi.naueka.de/subtask/${id}/`;
 
     fetch(url, {
       method: 'PUT',
@@ -435,7 +435,7 @@ async function createGuestUser() {
 
 
   try {
-    const response = await fetch("http://127.0.0.1:8000/register/", requestOptions);
+    const response = await fetch("https://joinapi.naueka.de/register/", requestOptions);
     const result = await response.text();
   } catch (error) {
     console.error(error);

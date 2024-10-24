@@ -18,7 +18,7 @@ async function signUp() {
 
 
   try {
-    const response = await fetch("http://127.0.0.1:8000/register/", requestOptions);
+    const response = await fetch("https://joinapi.naueka.de/register/", requestOptions);
     const result = await response.text();
     resetForm();
     window.location.href = "./"; // Hier kannst du die Antwort verarbeiten
