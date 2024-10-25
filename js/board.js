@@ -1,7 +1,8 @@
 /** für Drag&Drop  */
 let currentDraggedElement;
+let previousWidthIsMobile = window.innerWidth < 900;
 
-async function renderBoard() {
+async function renderBoard() {    
     checkLogIn()
     await renderBoardCards();
 }
@@ -426,12 +427,19 @@ function isMobileDevice() {
 /**
  * Eventlistner to render board if screen changes between desktop and MobileMode
  */
+
+
 window.addEventListener('resize', handleScreenResize);
 
-function handleScreenResize() {
-    if (window.innerWidth < 900 && window.location.pathname === '/board.html') {
-        renderBoard();
-    } else if (window.innerWidth >= 900 && window.location.pathname === '/board.html') {
-        renderBoard();
+async function handleScreenResize() {
+    const isMobile = window.innerWidth < 900;
+
+    if (window.location.pathname === '/board.html') {
+        if (isMobile !== previousWidthIsMobile) {
+            previousWidthIsMobile = isMobile;
+            
+            await deleteBoard();
+            renderBoard();
+        }
     }
 }

@@ -1,4 +1,4 @@
-const STORAGE_URL = "https://joinapi.naueka.de";
+const STORAGE_URL = "https://joinapi.naueka.de/";
 let taskToDeleteSub;
 
 

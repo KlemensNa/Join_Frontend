@@ -115,7 +115,9 @@ async function createNameCircle() {
 * 
 */
 function logoutUser(){
-  localStorage.setItem(`loggedIn`, false);
+  console.log(localStorage)
+  localStorage.clear()
+  crossOriginIsolated.log(localStorage)
 }
 
 

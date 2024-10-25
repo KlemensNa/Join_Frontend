@@ -52,7 +52,6 @@ async function createTask(event) {
       subtasks: subTasksIDs,
       column: column,
     };
-    console.log(task)
     tasks.push(task);
     saveTask(task);
     flushSubtasks();

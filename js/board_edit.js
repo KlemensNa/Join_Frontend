@@ -208,7 +208,6 @@ async function addSubTaskEdit(id) {
  * @param {*} a 
  */
 function askBeforeDelete(taskID) {
-    console.log(taskID)
     
     let confirmDelete = document.getElementById('confirmDeleteTask');
     confirmDelete.classList.remove('d-none');
