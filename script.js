@@ -96,9 +96,8 @@ async function guestUser(){
 
 function checkLogIn() {
   let LogInStatus = localStorage.getItem(`loggedIn`);
-  if (LogInStatus == 'false') {
+  if (LogInStatus == 'false' || LogInStatus == null) {
     window.location.href = "index.html"
-    alert('Please Log In to view this Page.');
   }
 }
 
